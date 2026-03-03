@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReviewHub – Track your & competitors' Android & iOS app reviews</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/logo-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h2>ReviewHub</h2>
+        <span class="logo-tagline">Your & competitors' Android &amp; iOS app reviews in one place</span>
+      </div>
+    </div>
+    
+    <div class="app-selector">
+      <label>Active App</label>
+      <div class="app-select-wrapper">
+        <select id="appSelect">
+          <option value="">All Apps</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+    </div>
+    
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <div class="nav-section">
+        <span class="nav-label">Insights</span>
+        <a href="#" class="nav-item active" data-section="dashboard" title="Overview, charts and key metrics">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+          </span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-section="reviews" title="Browse, search and filter all reviews">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+          </span>
+          <span class="nav-text">Reviews</span>
+          <span class="nav-badge" id="reviewsBadge" aria-label="Total reviews">0</span>
+        </a>
+        <a href="#" class="nav-item" data-section="analytics" title="Charts, sentiment and platform comparison">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            </svg>
+          </span>
+          <span class="nav-text">Analytics</span>
+        </a>
+      </div>
+      <div class="nav-section nav-section--manage">
+        <span class="nav-label">Manage</span>
+        <a href="#" class="nav-item" data-section="apps" title="Add or remove Android &amp; iOS apps to track">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="9" height="9" rx="2"></rect>
+              <rect x="13" y="2" width="9" height="9" rx="2"></rect>
+              <rect x="2" y="13" width="9" height="9" rx="2"></rect>
+              <circle cx="17.5" cy="17.5" r="4.5"></circle>
+              <path d="M17.5 15v5M15 17.5h5"></path>
+            </svg>
+          </span>
+          <span class="nav-text">Apps</span>
+          <span class="nav-badge" id="appsBadge" aria-label="Number of apps">0</span>
+        </a>
+      </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div class="sync-indicator" id="globalSyncIndicator">
+        <div class="sync-dot"></div>
+        <span>All synced</span>
+      </div>
+      <div class="user-menu">
+        <div class="user-info" id="userInfo">
+          <span class="user-name">Admin</span>
+          <span class="user-role">admin</span>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div id="passwordChangeBanner" class="password-change-banner" style="display: none;">
+      <span class="password-change-banner-text">You're still using the initial password. Please set a new password for security.</span>
+      <button type="button" class="btn btn-primary btn-sm" id="showChangePasswordBtn">Change password</button>
+    </div>
+    <header class="header">
+      <div class="header-left">
+        <h1 id="pageTitle">Dashboard</h1>
+        <p class="app-value-proposition">One place to track your and your competitors' <strong>Android</strong> &amp; <strong>iOS</strong> app reviews.</p>
+        <div class="breadcrumb">
+          <span>Overview</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          <span id="breadcrumbCurrent">All Apps</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-actions">
+          <button id="refreshBtn" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6"></path>
+              <path d="M1 20v-6h6"></path>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Sync Now
+          </button>
+          <button id="exportBtn" class="btn btn-secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section id="dashboardSection" class="section active">
+      <!-- Hero Stats -->
+      <div class="hero-stats">
+        <div class="hero-stat-card gradient-blue">
+          <div class="hero-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+          </div>
+          <div class="hero-stat-content">
+            <span class="hero-stat-label">Total Reviews</span>
+            <span class="hero-stat-value" id="totalReviews">0</span>
+            <div class="hero-stat-chart">
+              <canvas id="reviewsSparkline"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hero-stat-card gradient-yellow">
+          <div class="hero-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <div class="hero-stat-content">
+            <span class="hero-stat-label">Average Rating</span>
+            <span class="hero-stat-value" id="avgRating">0.0</span>
+            <div class="hero-stat-stars" id="avgStars"></div>
+          </div>
+        </div>
+        
+        <div class="hero-stat-card gradient-green">
+          <div class="hero-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+            </svg>
+          </div>
+          <div class="hero-stat-content">
+            <span class="hero-stat-label">Positive</span>
+            <span class="hero-stat-value" id="positiveReviews">0</span>
+            <span class="hero-stat-percent" id="positivePercent">0%</span>
+          </div>
+        </div>
+        
+        <div class="hero-stat-card gradient-red">
+          <div class="hero-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+            </svg>
+          </div>
+          <div class="hero-stat-content">
+            <span class="hero-stat-label">Negative</span>
+            <span class="hero-stat-value" id="negativeReviews">0</span>
+            <span class="hero-stat-percent negative" id="negativePercent">0%</span>
+          </div>
+        </div>
+        
+        <div class="hero-stat-card gradient-purple">
+          <div class="hero-stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div class="hero-stat-content">
+            <span class="hero-stat-label">Response Rate</span>
+            <span class="hero-stat-value" id="responseRate">0%</span>
+            <span class="hero-stat-subtext" id="responseCount">0 of 0 replied</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Charts Row -->
+      <div class="charts-row">
+        <div class="chart-card chart-large">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Review Trends</h3>
+              <p>Reviews and ratings over time</p>
+            </div>
+            <div class="chart-legend" id="trendLegend">
+              <div class="legend-item">
+                <span class="legend-color" style="background: linear-gradient(135deg, #6366f1, #8b5cf6)"></span>
+                Reviews
+              </div>
+              <div class="legend-item">
+                <span class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #f97316)"></span>
+                Avg Rating
+              </div>
+            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="timelineChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Charts Row -->
+      <div class="charts-row three-col">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Rating Distribution</h3>
+              <p>Breakdown by star rating</p>
+            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="ratingChart"></canvas>
+          </div>
+          <div class="rating-bars" id="ratingBars"></div>
+        </div>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Sentiment Analysis</h3>
+              <p>Overall review sentiment</p>
+            </div>
+          </div>
+          <div class="chart-body donut-container">
+            <canvas id="sentimentChart"></canvas>
+            <div class="donut-center" id="sentimentCenter">
+              <span class="donut-value">0%</span>
+              <span class="donut-label">Positive</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Top Keywords</h3>
+              <p>Most mentioned words</p>
+            </div>
+          </div>
+          <div class="chart-body">
+            <div class="keywords-cloud" id="keywordsCloud">
+              <div class="keyword-loading">Analyzing reviews...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Emotions and Response Row -->
+      <div class="charts-row two-col">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Emotion Analysis</h3>
+              <p>Detected emotions in reviews</p>
+            </div>
+            <button class="btn btn-sm btn-secondary" id="analyzeSentimentBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path d="M23 4v6h-6"></path>
+                <path d="M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Re-analyze
+            </button>
+          </div>
+          <div class="chart-body">
+            <canvas id="emotionChart"></canvas>
+          </div>
+          <div class="emotion-tags" id="emotionTags"></div>
+        </div>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Developer Response</h3>
+              <p>Response rate by rating</p>
+            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="responseChart"></canvas>
+          </div>
+          <div class="response-stats" id="responseStats">
+            <div class="response-stat">
+              <span class="response-stat-label">Avg Response Time</span>
+              <span class="response-stat-value" id="avgResponseTime">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Reviews -->
+      <div class="reviews-section">
+        <div class="section-header">
+          <div class="section-title">
+            <h3>Recent Reviews</h3>
+            <p>Latest feedback from users</p>
+          </div>
+          <a href="#" class="view-all-link" onclick="showSection('reviews'); return false;">
+            View All
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+        <div id="recentReviewsList" class="reviews-grid"></div>
+      </div>
+    </section>
+
+    <section id="reviewsSection" class="section">
+      <div class="filters-bar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search reviews...">
+        </div>
+        <div class="filter-chips">
+          <select id="ratingFilter" class="filter-select">
+            <option value="">All Ratings</option>
+            <option value="5">★★★★★ (5)</option>
+            <option value="4">★★★★☆ (4)</option>
+            <option value="3">★★★☆☆ (3)</option>
+            <option value="2">★★☆☆☆ (2)</option>
+            <option value="1">★☆☆☆☆ (1)</option>
+          </select>
+          <select id="sentimentFilter" class="filter-select">
+            <option value="">All Sentiments</option>
+            <option value="positive">😊 Positive</option>
+            <option value="neutral">😐 Neutral</option>
+            <option value="negative">😞 Negative</option>
+          </select>
+          <select id="emotionFilter" class="filter-select">
+            <option value="">All Emotions</option>
+            <option value="happy">😄 Happy</option>
+            <option value="satisfied">👍 Satisfied</option>
+            <option value="frustrated">😤 Frustrated</option>
+            <option value="disappointed">😔 Disappointed</option>
+            <option value="confused">😕 Confused</option>
+          </select>
+          <select id="replyFilter" class="filter-select">
+            <option value="">All Reviews</option>
+            <option value="replied">💬 With Reply</option>
+            <option value="no-reply">No Reply</option>
+          </select>
+          <select id="sortFilter" class="filter-select">
+            <option value="date">Newest First</option>
+            <option value="score">Highest Rated</option>
+            <option value="thumbsUp">Most Helpful</option>
+          </select>
+          <select id="orderFilter" class="filter-select">
+            <option value="DESC">Descending</option>
+            <option value="ASC">Ascending</option>
+          </select>
+        </div>
+      </div>
+      <div id="allReviewsList" class="reviews-list-full"></div>
+      <div id="pagination" class="pagination"></div>
+    </section>
+
+    <section id="analyticsSection" class="section">
+      <div class="analytics-header">
+        <h2>Deep Analytics</h2>
+        <p>Detailed insights into your app reviews</p>
+      </div>
+      
+      <!-- Platform Comparison -->
+      <div class="platform-comparison-card" id="platformComparison">
+        <div class="comparison-header">
+          <h3>Platform Comparison</h3>
+          <p>Side-by-side analytics across platforms</p>
+        </div>
+        <div class="comparison-grid" id="comparisonGrid">
+          <div class="comparison-loading">Loading platform data...</div>
+        </div>
+      </div>
+      
+      <div class="analytics-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Rating Breakdown</h3>
+              <p>Percentage by rating</p>
+            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="ratingBreakdownChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Monthly Rating Trend</h3>
+              <p>Average rating over months</p>
+            </div>
+          </div>
+          <div class="chart-body">
+            <canvas id="monthlyRatingChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="app-info-card">
+        <div class="app-info-header">
+          <h3>App Information</h3>
+          <p id="appInfoSubtitle">Details from App Store</p>
+        </div>
+        <div id="appInfo" class="app-info-grid">
+          <p class="info-placeholder">Select an app to view information</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="appsSection" class="section">
+      <div class="add-app-section">
+        <div class="add-app-card">
+          <div class="add-app-header">
+            <div class="add-app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 8v8M8 12h8"></path>
+              </svg>
+            </div>
+            <div>
+              <h3>Add New App</h3>
+              <p>Track reviews from Google Play Store or Apple App Store</p>
+            </div>
+          </div>
+          <div class="platform-tabs">
+            <button class="platform-tab active" data-platform="android" onclick="selectPlatformTab('android')">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.4-.59-2.96-.92-4.47-.92s-3.07.33-4.47.92L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+              Android
+            </button>
+            <button class="platform-tab" data-platform="ios" onclick="selectPlatformTab('ios')">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              iOS
+            </button>
+          </div>
+          <div class="add-app-form">
+            <div class="input-with-icon">
+              <span class="input-icon" id="platformIcon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.4-.59-2.96-.92-4.47-.92s-3.07.33-4.47.92L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+              </span>
+              <input type="text" id="playStoreUrl" placeholder="https://play.google.com/store/apps/details?id=..." class="app-url-input">
+            </div>
+            <button type="button" id="addAppBtn" class="btn btn-primary btn-lg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+              Add App
+            </button>
+          </div>
+          <div class="url-examples">
+            <span class="url-example-label">Examples:</span>
+            <code class="url-example android-example">play.google.com/store/apps/details?id=com.example.app</code>
+            <code class="url-example ios-example">apps.apple.com/app/app-name/id123456789</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="apps-platforms-container">
+        <div class="platform-section android">
+          <div class="platform-section-header">
+            <div class="platform-section-icon android">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.4-.59-2.96-.92-4.47-.92s-3.07.33-4.47.92L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+            </div>
+            <div class="platform-section-title">
+              <h3>Android Apps</h3>
+              <p>Google Play Store</p>
+            </div>
+            <span class="platform-app-count" id="androidAppCount">0 apps</span>
+          </div>
+          <div id="androidAppsList" class="platform-apps-list"></div>
+        </div>
+        <div class="platform-section ios">
+          <div class="platform-section-header">
+            <div class="platform-section-icon ios">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            </div>
+            <div class="platform-section-title">
+              <h3>iOS Apps</h3>
+              <p>Apple App Store</p>
+            </div>
+            <span class="platform-app-count" id="iosAppCount">0 apps</span>
+          </div>
+          <div id="iosAppsList" class="platform-apps-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="changePasswordModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-banner" id="modalPasswordBanner" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>You're still using the initial password. Please set a new password to continue.</span>
+      </div>
+      <h3>Change password</h3>
+      <p class="modal-description">Enter your current password and choose a new one.</p>
+      <form id="changePasswordForm">
+        <div class="form-group">
+          <label for="changePasswordCurrent">Current password</label>
+          <input type="password" id="changePasswordCurrent" required autocomplete="current-password">
+        </div>
+        <div class="form-group">
+          <label for="changePasswordNew">New password</label>
+          <input type="password" id="changePasswordNew" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="changePasswordConfirm">Confirm new password</label>
+          <input type="password" id="changePasswordConfirm" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="closeChangePasswordBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="loader" class="loader-overlay">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <span>Loading...</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

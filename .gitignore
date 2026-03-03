@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+
+# Database (stored in data/ – never commit)
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Secrets / certs
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build / output
+dist/
+build/
+coverage/
+.cache/

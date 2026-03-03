@@ -1,0 +1,47 @@
+{
+  "name": "reviewhub",
+  "version": "1.0.0",
+  "description": "Self-hosted dashboard to track and analyze your and your competitors' Android (Google Play) and iOS (App Store) app reviews — ratings, sentiment, trends and more.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "app-reviews",
+    "google-play",
+    "app-store",
+    "review-dashboard",
+    "sentiment-analysis",
+    "analytics",
+    "android",
+    "ios",
+    "competitor-analysis",
+    "self-hosted"
+  ],
+  "author": "raksbisht",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raksbisht/reviewhub.git"
+  },
+  "homepage": "https://github.com/raksbisht/reviewhub#readme",
+  "bugs": {
+    "url": "https://github.com/raksbisht/reviewhub/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "app-store-scraper": "^0.18.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.6.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "google-play-scraper": "^10.1.2",
+    "jsonwebtoken": "^9.0.3",
+    "sentiment": "^5.0.2"
+  }
+}
